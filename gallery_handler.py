@@ -24,13 +24,13 @@ def resize_and_watermark():
             if not file.endswith('.docx'):
                 try:
                     img = Image.open(f'{address}/{file}')
-                    img.convert('RGB')
+                    img = img.convert('RGB')
                     img.width <= RESIZE.width or img.thumbnail(RESIZE, Image.ANTIALIAS)
                     img.paste(logo, ((img.width - logo.width) // 2, (img.height - logo.height) // 2), mask=logo)
                     img.save(f'{handled_folder}/{i}.jpg', quality=QUALITY)
                     handled_count += 1
-                except OSError:
-                    print('error')
+                except OSError as e:
+                    print(e)
                     return
         print(f'*** {folder} finished. Handled - {handled_count} photo ***')
 
