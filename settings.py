@@ -14,3 +14,8 @@ ORIENTATION_ANGLE = {
     6: 270,
     8: 90
 }
+
+EXTENSIONS = {
+    'jpg': {'mode': 'RGB'},
+    'webp': {'mode': 'RGBA'},
+}
