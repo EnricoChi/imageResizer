@@ -13,7 +13,7 @@ BASE_LOGO = Image.open(LOGO_PATH)
 @click.option('--keep_name', is_flag=True, help='Keep image name')
 @click.option('--quality', default=QUALITY, help='Image quality')
 @click.option('--exif', is_flag=True, help='Exif tags normalize')
-@click.option('--resize', is_flag=True, help='Resize img')
+@click.option('--resize', type=(int, int), default=RESIZE, help='Resize img')
 @click.option('--watermark', is_flag=True, help='Add watermark to image')
 @click.option('--ext', type=click.Choice(EXTENSIONS.keys(), case_sensitive=True), help='Image extensions')
 def handle_image(ext, watermark, resize, exif, quality, keep_name):
@@ -36,7 +36,9 @@ def handle_image(ext, watermark, resize, exif, quality, keep_name):
                         img = img.convert(EXTENSIONS[ext]['mode'])
 
                         if resize:
-                            img.width <= RESIZE.width or img.thumbnail(RESIZE, Image.ANTIALIAS)
+                            height, width = resize
+                            resize = Size(height, width)
+                            img.width <=  resize.width or img.thumbnail(resize, Image.ANTIALIAS)
 
                         if watermark:
                             img = img_add_watermark(img)
