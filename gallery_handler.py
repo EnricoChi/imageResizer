@@ -3,7 +3,7 @@ import os
 import click
 from PIL import Image, ExifTags
 
-from settings import LOGO_PATH, ROOT, HANDLED, ORIENTATION_ANGLE, RESIZE, Size, QUALITY, EXTENSIONS
+from settings import LOGO_PATH, ROOT, HANDLED, ORIENTATION_ANGLE, QUALITY, EXTENSIONS
 from utils import ProgressBar
 
 BASE_LOGO = Image.open(LOGO_PATH)
@@ -13,7 +13,7 @@ BASE_LOGO = Image.open(LOGO_PATH)
 @click.option('--keep_name', is_flag=True, help='Keep image name')
 @click.option('--quality', default=QUALITY, help='Image quality')
 @click.option('--exif', is_flag=True, help='Exif tags normalize')
-@click.option('--resize', type=(int, int), default=RESIZE, help='Resize img')
+@click.option('--resize', type=int, default=800, help='Resize img')
 @click.option('--watermark', is_flag=True, help='Add watermark to image')
 @click.option('--ext', type=click.Choice(EXTENSIONS.keys(), case_sensitive=True), help='Image extensions')
 def handle_image(ext, watermark, resize, exif, quality, keep_name):
@@ -36,9 +36,9 @@ def handle_image(ext, watermark, resize, exif, quality, keep_name):
                         img = img.convert(EXTENSIONS[ext]['mode'])
 
                         if resize:
-                            height, width = resize
-                            resize = Size(height, width)
-                            img.width <=  resize.width or img.thumbnail(resize, Image.ANTIALIAS)
+                            # height, width = resize
+                            # resize = Size(height, width)
+                            max(img.width, img.height) <= resize or img.thumbnail([resize, resize], Image.ANTIALIAS)
 
                         if watermark:
                             img = img_add_watermark(img)
@@ -66,7 +66,7 @@ def img_add_watermark(img):
     logo = BASE_LOGO.copy()
 
     # Ресайзим лого по ширине, если оно больше чем само изображение
-    logo.width < img.width or logo.thumbnail(Size(img.width - 50, logo.height), Image.ANTIALIAS)
+    logo.width < img.width or logo.thumbnail([img.width - 50, logo.height], Image.ANTIALIAS)
 
     img.paste(logo, ((img.width - logo.width) // 2, (img.height - logo.height) // 2), mask=logo)
 

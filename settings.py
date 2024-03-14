@@ -5,8 +5,8 @@ HANDLED = 'handled/'
 LOGO_PATH = 'logo.png'
 
 
-Size = namedtuple('Size', ('width', 'height'))
-RESIZE = Size(800, 600)
+# Size = namedtuple('Size', ('width', 'height'))
+# RESIZE = Size(800, 600)
 QUALITY = 60
 
 ORIENTATION_ANGLE = {
