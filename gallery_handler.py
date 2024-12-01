@@ -7,6 +7,7 @@ from settings import LOGO_PATH, ROOT, HANDLED, ORIENTATION_ANGLE, QUALITY, EXTEN
 from utils import ProgressBar
 
 BASE_LOGO = Image.open(LOGO_PATH)
+EXT_LIST_FOR_SKIP = ('docx', 'doc', 'txt')
 
 
 @click.command()
@@ -24,8 +25,7 @@ def handle_image(ext, watermark, resize, exif, quality, keep_name):
         address, _, file_list = next(os.walk(image_folder))
         with ProgressBar(folder, max=len(file_list)) as bar:
             for i, file in enumerate(file_list):
-
-                if not file.endswith('.docx'):
+                if not any([file.endswith(ext) for ext in EXT_LIST_FOR_SKIP]):
                     try:
                         img = Image.open(f'{address}/{file}')
 
