@@ -7,7 +7,7 @@ from settings import LOGO_PATH, ROOT, HANDLED, ORIENTATION_ANGLE, QUALITY, EXTEN
 from utils import ProgressBar
 
 BASE_LOGO = Image.open(LOGO_PATH)
-EXT_LIST_FOR_SKIP = ('docx', 'doc', 'txt')
+EXT_LIST_FOR_SKIP = ('docx', 'doc', 'txt', 'pdf')
 
 
 @click.command()
@@ -15,9 +15,10 @@ EXT_LIST_FOR_SKIP = ('docx', 'doc', 'txt')
 @click.option('--quality', default=QUALITY, help='Image quality')
 @click.option('--exif', is_flag=True, help='Exif tags normalize')
 @click.option('--resize', type=int, default=800, help='Resize img')
+@click.option('--crop', type=int, default=[330, 220], help='Crop img', multiple=True)
 @click.option('--watermark', is_flag=True, help='Add watermark to image')
 @click.option('--ext', type=click.Choice(EXTENSIONS.keys(), case_sensitive=True), help='Image extensions')
-def handle_image(ext, watermark, resize, exif, quality, keep_name):
+def handle_image(ext, watermark, crop, resize, exif, quality, keep_name):
     for folder in os.listdir(ROOT):
         image_folder = f'{ROOT}{folder}/'
         handled_folder = f'{image_folder}{HANDLED}/'
@@ -40,6 +41,9 @@ def handle_image(ext, watermark, resize, exif, quality, keep_name):
                             # resize = Size(height, width)
                             max(img.width, img.height) <= resize or img.thumbnail([resize, resize], Image.ANTIALIAS)
 
+                        if crop:
+                            img = crop_to_fit(img, crop)
+
                         if watermark:
                             img = img_add_watermark(img)
                         file_name = file.split('.')[0] if keep_name else i
@@ -49,6 +53,27 @@ def handle_image(ext, watermark, resize, exif, quality, keep_name):
                         return
                 bar.next()
 
+def crop_to_fit(img, target_size):
+    target_w, target_h = target_size
+    img_ratio = img.width / img.height
+    target_ratio = target_w / target_h
+
+    # Масштабируем изображение
+    if img_ratio > target_ratio:
+        scale = target_h / img.height
+    else:
+        scale = target_w / img.width
+
+    new_size = (int(img.width * scale), int(img.height * scale))
+    img = img.resize(new_size, Image.ANTIALIAS)
+
+    # Центрируем и обрезаем
+    left = (img.width - target_w) // 2
+    top = (img.height - target_h) // 2
+    right = left + target_w
+    bottom = top + target_h
+    img = img.crop((left, top, right, bottom))
+    return img
 
 def exif_fix(img):
     if hasattr(img, '_getexif'):
